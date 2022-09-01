@@ -11,7 +11,7 @@ namespace StorybrewScripts
         double beat;
         public override void Generate()
         {
-		    beat = Beatmap.GetTimingPointAt(1421).BeatDuration;
+            beat = Beatmap.GetTimingPointAt(1421).BeatDuration;
 
             using (var pool = new SpritePool(GetLayer("Foreground"), "sb/p.png", new Vector2(320, 240), (pooledSprite, start, end) =>
             {

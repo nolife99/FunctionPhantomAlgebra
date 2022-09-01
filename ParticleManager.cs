@@ -15,7 +15,7 @@ namespace StorybrewScripts
             Danmaku(109895, 126166, 5000);
             Danmaku(109895, 126166, 5000, true);
 
-		    FallingDownParticle(88200, 109895, true);
+            FallingDownParticle(88200, 109895, true);
             FallingDownParticle(131590, 151929);
 
             FallingDownParticle(174980, 217370, true);
