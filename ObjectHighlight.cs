@@ -11,7 +11,7 @@ namespace StorybrewScripts
     {
         public override void Generate()
         {
-		    Cursor(88200, 109810);
+            Cursor(88200, 109810);
             Cursor(153285, 173539, true);
             Cursor(174980, 196590);
             Cursor(196675, 218285, true);
