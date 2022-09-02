@@ -47,11 +47,14 @@ namespace StorybrewScripts
                 Flash(97692, 0.8);
                 Flash(99048, 1);
                 Flash(109895, 1);
+                Flash(164132, 0.8);
                 Flash(174980, 1);
                 Flash(184471, 0.8);
                 Flash(185827, 1);
                 Flash(196675, 1);
+                Flash(202098, 0.8);
                 Flash(207522, 1);
+                Flash(212946, 0.8);
                 Flash(218370, 1);
                 Flash(229217, 1);
                 Flash(240065, 1);

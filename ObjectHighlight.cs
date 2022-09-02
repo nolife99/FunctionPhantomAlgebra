@@ -29,7 +29,7 @@ namespace StorybrewScripts
             OsuHitObject lastObject = null;
             foreach (var hitobject in Beatmap.HitObjects)
             {
-                var timestep = Beatmap.GetTimingPointAt((int)hitobject.StartTime).BeatDuration / 24;
+                var timestep = Beatmap.GetTimingPointAt((int)hitobject.StartTime).BeatDuration / 32;
                 if (hitobject.StartTime >= StartTime - 5 && hitobject.StartTime <= EndTime + 5)
                 {
                     if (lastObject == null)
