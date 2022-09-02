@@ -6,7 +6,7 @@ using System;
 
 namespace StorybrewScripts
 {
-    class BgAnim : StoryboardObjectGenerator
+    class BackgroundManager : StoryboardObjectGenerator
     {
         double beat;
         public override void Generate()
