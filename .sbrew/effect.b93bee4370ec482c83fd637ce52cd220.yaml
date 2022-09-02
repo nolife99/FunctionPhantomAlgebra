@@ -1,33 +1,33 @@
 ﻿FormatVersion: 7
-Name: "BgAnim 1"
-Script: "BgAnim"
+Name: "BackgroundManager 1"
+Script: "BackgroundManager"
 Config:
   RandomSeed:
     Type: "System.Int32"
     Value: "0"
     DisplayName: "Random seed"
 Layers:
-  55c9dd80bb044d92946460c5664d5f30:
+  b269d6cdd26f403fba19f4007282b270:
     Name: "BeatBG"
     OsbLayer: Background
     DiffSpecific: No
     Visible: Yes
-  3e80afb900f54387a650e073dde3ddd7:
+  6a62c6472d8c4c33ba3f44a8b7319257:
     Name: "GlitchAnim"
     OsbLayer: Background
     DiffSpecific: No
     Visible: Yes
-  aead3e3404754f3da690e280bcc2c6b5:
-    Name: "Letterbox"
-    OsbLayer: Background
-    DiffSpecific: No
-    Visible: Yes
-  40afda436493405baf5568c8f2edca9b:
+  c79e5e8867ff4a78bfd14794f2e930aa:
     Name: "Transition"
     OsbLayer: Background
     DiffSpecific: No
     Visible: Yes
-  fefc4f0a199d45c0ba925d7ae7bb9549:
+  bc41962f4e17457caf9cc48abe58abff:
+    Name: "Letterbox"
+    OsbLayer: Background
+    DiffSpecific: No
+    Visible: Yes
+  d5e57569c52a4cbe8165a6afe0159c99:
     Name: "Foreground"
     OsbLayer: Foreground
     DiffSpecific: No

@@ -52,7 +52,7 @@
   </Target>
   -->
   <ItemGroup>
-    <Compile Include="BgAnim.cs" />
+    <Compile Include="BackgroundManager.cs" />
     <Compile Include="ImportOsb.cs" />
     <Compile Include="ObjectHighlight.cs" />
     <Compile Include="ParticleManager.cs" />
