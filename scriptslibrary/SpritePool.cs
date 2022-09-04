@@ -23,46 +23,22 @@ namespace StorybrewCommon.Storyboarding
             this.position = position;
             this.finalizeSprite = finalizeSprite;
         }
+
         public SpritePool(StoryboardLayer layer, string path, OsbOrigin origin, Action<OsbSprite, double, double> finalizeSprite = null)
-        {
-            this.layer = layer;
-            this.path = path;
-            this.origin = origin;
-            this.position = Vector2.Zero;
-            this.finalizeSprite = finalizeSprite;
-        }
+        : this(layer, path, origin, Vector2.Zero, finalizeSprite){}
+
         public SpritePool(StoryboardLayer layer, string path, Vector2 position, Action<OsbSprite, double, double> finalizeSprite = null)
-        {
-            this.layer = layer;
-            this.path = path;
-            this.origin = OsbOrigin.Centre;
-            this.position = position;
-            this.finalizeSprite = finalizeSprite;
-        }
+        : this(layer, path, OsbOrigin.Centre, position, finalizeSprite){}
+
         public SpritePool(StoryboardLayer layer, string path, Action<OsbSprite, double, double> finalizeSprite = null)
-        {
-            this.layer = layer;
-            this.path = path;
-            this.origin = OsbOrigin.Centre;
-            this.position = Vector2.Zero;
-            this.finalizeSprite = finalizeSprite;
-        }
+        : this(layer, path, OsbOrigin.Centre, Vector2.Zero, finalizeSprite){}
+
         public SpritePool(StoryboardLayer layer, string path, OsbOrigin origin, Vector2 position, bool additive)
-        {
-            this.layer = layer;
-            this.path = path;
-            this.origin = origin;
-            this.position = position;
-            this.finalizeSprite = additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>) null;
-        }
+        : this(layer, path, origin, position, additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>)null){}
+
         public SpritePool(StoryboardLayer layer, string path, bool additive)
-        {
-            this.layer = layer;
-            this.path = path;
-            this.origin = OsbOrigin.Centre;
-            this.position = Vector2.Zero;
-            this.finalizeSprite = additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>) null;
-        }
+        : this(layer, path, OsbOrigin.Centre, Vector2.Zero, additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>)null){}
+
         public OsbSprite Get(double startTime, double endTime)
         {
             var result = (PooledSprite)null;
