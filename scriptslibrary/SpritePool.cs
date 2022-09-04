@@ -41,9 +41,9 @@ namespace StorybrewCommon.Storyboarding
 
         public OsbSprite Get(double startTime, double endTime)
         {
-            var result = (PooledSprite)null;
+            PooledSprite result = null;
+            
             foreach (var pooledSprite in pooledSprites)
-
             if (getMaxPoolDuration(startTime, endTime, MaxPoolDuration, pooledSprite) && 
             (result == null || pooledSprite.StartTime < result.StartTime)) result = pooledSprite;
 
@@ -59,11 +59,8 @@ namespace StorybrewCommon.Storyboarding
             return sprite;
         }
         static bool getMaxPoolDuration(double startTime, double endTime, int value, PooledSprite sprite)
-        {
-            var result = sprite.EndTime <= startTime;
-            if (value > 0) result = sprite.EndTime <= startTime && startTime < sprite.StartTime + value;
-            return result;
-        }
+        => value > 0 ? sprite.EndTime <= startTime && startTime < sprite.StartTime + value : sprite.EndTime <= startTime;
+
         public void Clear()
         {
             if (finalizeSprite != null)
@@ -75,7 +72,7 @@ namespace StorybrewCommon.Storyboarding
             pooledSprites.Clear();
         }
         
-        protected virtual OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin, Vector2 position) 
+        protected virtual OsbSprite CreateSprite(StoryboardLayer layer, string path, OsbOrigin origin, Vector2 position)
         => layer.CreateSprite(path, origin, position);
 
         class PooledSprite
@@ -91,16 +88,16 @@ namespace StorybrewCommon.Storyboarding
             }
         }
         
-        bool disposedValue = false;
-        protected virtual void Dispose(bool disposing)
+        bool disposed = false;
+        protected virtual void Dispose(bool dispose)
         {
-            if (!disposedValue)
+            if (!disposed)
             {
-                if (disposing)
+                if (dispose)
                 {
                     Clear();
                 }
-                disposedValue = true;
+                disposed = true;
             }
         }
         public void Dispose()
@@ -124,7 +121,6 @@ namespace StorybrewCommon.Storyboarding
                 foreach (var pool in pools.Values) pool.MaxPoolDuration = maxPoolDuration;
             }
         }
-
         public SpritePools(StoryboardLayer layer)
         {
             this.layer = layer;
@@ -144,13 +140,13 @@ namespace StorybrewCommon.Storyboarding
         => getPool(path, origin, Vector2.Zero, attributes, group).Get(startTime, endTime);
 
         public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin, bool additive, int group = 0)
-        => Get(startTime, endTime, path, origin, Vector2.Zero, additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>) null, group); 
+        => Get(startTime, endTime, path, origin, Vector2.Zero, additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>)null, group); 
 
         public OsbSprite Get(double startTime, double endTime, string path, bool additive, int group = 0)
-        => Get(startTime, endTime, path, OsbOrigin.Centre, Vector2.Zero, additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>) null, group); 
+        => Get(startTime, endTime, path, OsbOrigin.Centre, Vector2.Zero, additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>)null, group); 
 
-        public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin, Vector2 position, bool additive, int poolGroup = 0)
-        => Get(startTime, endTime, path, origin, position, additive ? (sprite, spriteStartTime, spriteEndTime) => sprite.Additive(spriteStartTime) : (Action<OsbSprite, double, double>) null, poolGroup);
+        public OsbSprite Get(double startTime, double endTime, string path, OsbOrigin origin, Vector2 position, bool additive, int group = 0)
+        => Get(startTime, endTime, path, origin, position, additive ? (sprite, start, end) => sprite.Additive(start) : (Action<OsbSprite, double, double>)null, group);
         
         SpritePool getPool(string path, OsbOrigin origin, Vector2 position, Action<OsbSprite, double, double> finalizeSprite, int poolGroup)
         {
@@ -162,16 +158,16 @@ namespace StorybrewCommon.Storyboarding
         string getKey(string path, OsbOrigin origin, Action<OsbSprite, double, double> action, int poolGroup)
         => $"{path}#{origin}#{action?.Target}.{action?.Method.Name}#{poolGroup}";
 
-        bool disposedValue = false;
-        protected virtual void Dispose(bool disposing)
+        bool disposed = false;
+        protected virtual void Dispose(bool dispose)
         {
-            if (!disposedValue)
+            if (!disposed)
             {
-                if (disposing)
+                if (dispose)
                 {
                     Clear();
                 }
-                disposedValue = true;
+                disposed = true;
             }
         }
         public void Dispose()
