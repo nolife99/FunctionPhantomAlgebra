@@ -2,6 +2,7 @@ using OpenTK;
 using StorybrewCommon.Mapset;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
+using StorybrewCommon.Storyboarding.CommandValues;
 using StorybrewCommon.Animations;
 using System;
 
@@ -26,79 +27,57 @@ namespace StorybrewScripts
             sprite.Color(StartTime, pixels ? "#BC62F5" : "#7FACF5");
             if (pixels) sprite.Rotate(StartTime, Math.PI / 4);
 
-            var lastObject = (OsuHitObject)null;
-            foreach (var hitobject in Beatmap.HitObjects)
+            Action<OsuHitObject> GetSliderMovement = objects =>
             {
-                var timestep = Beatmap.GetTimingPointAt((int)hitobject.StartTime).BeatDuration / 56;
-                if (hitobject.StartTime >= StartTime - 5 && hitobject.StartTime <= EndTime + 5)
+                var keyframe = new KeyframedValue<Vector2>(null);
+                var timeStep = Beatmap.GetTimingPointAt((int)objects.StartTime).BeatDuration / 64;
+                var startTime = objects.StartTime;
+                
+                while (true)
                 {
-                    if (lastObject == null)
+                    var endTime = startTime + timeStep;
+                    var complete = objects.EndTime - startTime < 1;
+                    if (complete) endTime = objects.EndTime;
+
+                    keyframe.Add(startTime, objects.PositionAtTime(startTime));
+
+                    if (complete) break;
+                    startTime += timeStep;
+                }
+                keyframe.Simplify2dKeyframes(1.0, v => v);
+                keyframe.ForEachPair((start, end) =>
+                {
+                    sprite.Move(start.Time, end.Time, start.Value, end.Value);
+                });
+            };
+
+            OsuHitObject lastObj = null;
+            foreach (var hit in Beatmap.HitObjects)
+            {
+                if (hit.StartTime >= StartTime - 5 && hit.StartTime <= EndTime + 5)
+                {
+                    if (lastObj == null)
                     {
-                        if (hitobject is OsuSlider)
-                        {
-                            var keyframe = new KeyframedValue<Vector2>(null);
-                            var startTime = hitobject.StartTime;
-                            while (true)
-                            {
-                                var endTime = startTime + timestep;
-
-                                var complete = hitobject.EndTime - startTime < 1;
-                                if (complete) endTime = hitobject.EndTime;
-
-                                var startPosition = hitobject.PositionAtTime(startTime);
-                                keyframe.Add(startTime, startPosition);
-
-                                if (complete) break;
-                                startTime += timestep;
-                            }
-                            keyframe.Simplify2dKeyframes(1, v => v);
-                            keyframe.ForEachPair((start, end) =>
-                            {
-                                sprite.Move(start.Time, end.Time, start.Value, end.Value);
-                            });
-                        }
+                        if (hit is OsuSlider) GetSliderMovement(hit);
                     }
                     else
                     {
-                        if (lastObject is OsuSlider)
+                        if (lastObj is OsuSlider)
                         {
-                            if (lastObject.Position != hitobject.Position)
-                            sprite.Move(OsbEasing.Out, lastObject.EndTime, hitobject.StartTime, lastObject.EndPosition, hitobject.Position);
-                            if (pixels && Random(2) % 2 == 0) 
-                            sprite.Rotate(OsbEasing.Out, lastObject.EndTime, hitobject.StartTime, Math.PI / 4, -Math.PI / 4);
+                            if (lastObj.EndPosition != hit.Position) sprite.Move(OsbEasing.Out, lastObj.EndTime, hit.StartTime, lastObj.EndPosition, hit.Position);
+                            if (pixels) sprite.Rotate(OsbEasing.Out, lastObj.EndTime, hit.StartTime, Math.PI / 4, -Math.PI / 4);
                         }
-                        else if (lastObject is OsuCircle)
+                        else if (lastObj is OsuCircle)
                         {
-                            if (lastObject.Position != hitobject.Position)
-                            sprite.Move(OsbEasing.Out, lastObject.StartTime, hitobject.StartTime, lastObject.Position, hitobject.Position);
-                            if (pixels && Random(2) % 2 == 0) 
-                            sprite.Rotate(OsbEasing.Out, lastObject.EndTime, hitobject.StartTime, -Math.PI / 4, Math.PI / 4);
+                            if (lastObj.Position != hit.Position) sprite.Move(OsbEasing.Out, lastObj.StartTime, hit.StartTime, lastObj.Position, hit.Position);
+                            if (pixels) sprite.Rotate(OsbEasing.Out, lastObj.EndTime, hit.StartTime, -Math.PI / 4, Math.PI / 4);
                         }
-                        if (hitobject is OsuSlider)
+                        if (hit is OsuSlider)
                         {
-                            var keyframe = new KeyframedValue<Vector2>(null);
-                            var startTime = hitobject.StartTime;
-                            while (true)
-                            {
-                                var endTime = startTime + timestep;
-
-                                var complete = hitobject.EndTime - startTime < 1;
-                                if (complete) endTime = hitobject.EndTime;
-
-                                var startPosition = hitobject.PositionAtTime(startTime);
-                                keyframe.Add(startTime, startPosition);
-                                keyframe.Simplify2dKeyframes(1, v => v);
-
-                                if (complete) break;
-                                startTime += timestep;
-                            }
-                            keyframe.ForEachPair((start, end) =>
-                            {
-                                sprite.Move(start.Time, end.Time, start.Value, end.Value);
-                            });
+                            GetSliderMovement(hit);
                         }
                     }
-                    lastObject = hitobject;
+                    lastObj = hit;
                 }
             }
             using (var pool = new SpritePool(GetLayer(""), pixels ? "sb/p.png" : "sb/hl.png", (pooledSprite, start, end) =>
@@ -109,10 +88,10 @@ namespace StorybrewScripts
                 if (pixels) pooledSprite.Rotate(start, Math.PI / 4);
             }))
             {
-                var lastPos = Vector2.Zero;
+                var lastPos = new CommandPosition(0, 0);
                 for (var i = StartTime; i < EndTime; i += 10)
                 {
-                    var pos = (Vector2)sprite.PositionAt(i);
+                    var pos = sprite.PositionAt(i);
                     if (pos != lastPos)
                     {
                         var trail = pool.Get(i, i + (pixels ? 1000 : 750));
@@ -120,6 +99,7 @@ namespace StorybrewScripts
                         else trail.Move(i, pos);
                         trail.Fade(i, i + (pixels ? 1000 : 750), pixels ? 0.5 : 0.3, 0);
                     }
+                    lastPos = pos;
                 }
             }
         }
