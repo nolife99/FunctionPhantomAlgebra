@@ -47,7 +47,7 @@ namespace StorybrewScripts
             for (var i = 0; i < BarCount; i++)
             {
                 var keyframes = heightKeyframes[i];
-                keyframes.Simplify1dKeyframes(1.5, h => h);
+                keyframes.Simplify1dKeyframes(1.9, f => f);
 
                 var topBar = GetLayer("").CreateSprite("sb/p.png", OsbOrigin.Centre, new Vector2(Position.X + i * barWidth, 0));
                 var bottomBar = GetLayer("").CreateSprite("sb/p.png", OsbOrigin.Centre, new Vector2(Position.X + i * barWidth, 0));

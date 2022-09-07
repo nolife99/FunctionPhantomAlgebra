@@ -8,6 +8,7 @@ namespace StorybrewScripts
 {
     class BackgroundManager : StoryboardObjectGenerator
     {
+        SpritePools pool;
         double beat;
         public override void Generate()
         {
@@ -60,11 +61,17 @@ namespace StorybrewScripts
                 Flash(240065, 1);
             }
 
-            SquareTransition(27183, 28539, 28539, 30, Color4.Purple);
-            SquareTransition(32607, 33963, 33963, 15, Color4.IndianRed, true);
-            SquareTransition(33200, 33963, 33963, 30, Color4.White);
-            SquareTransition(38709, 39387, 39387, 30, Color4.IndianRed);
-            SquareTransition(43454, 44810, 44810, 30, Color4.Purple);
+            using (pool = new SpritePools(GetLayer("Transition")))
+            {
+                SquareTransition(32607, 33963, 33963, 15, Color4.IndianRed, true);
+            }
+            using (pool = new SpritePools(GetLayer("Transition")))
+            {
+                SquareTransition(27183, 28539, 28539, 30, Color4.Purple);
+                SquareTransition(33200, 33963, 33963, 30, Color4.White);
+                SquareTransition(38709, 39387, 39387, 30, Color4.IndianRed);
+                SquareTransition(43454, 44810, 44810, 30, Color4.Purple);
+            }            
 
             Action<int> RedPart = delay => 
             {
@@ -94,17 +101,23 @@ namespace StorybrewScripts
                 Glitch(86166 + delay, 88200 + delay, 0.2);
                 Glitch(87522 + delay, 88200 + delay, 0.2);
 
-                SquareTransition(43454 + delay, 44810 + delay, 44810 + delay, 30, Color4.Purple);
-                SquareTransition(66505 + delay, 69217 + delay, 69217 + delay, 30, Color4.IndianRed);
-                SquareTransition(69217 + delay, 71929 + delay, 71929 + delay, 30, Color4.IndianRed);
-                SquareTransition(71929 + delay, 74641 + delay, 74641 + delay, 30, Color4.IndianRed);
-                SquareTransition(76675 + delay, 77353 + delay, 77353 + delay, 15, Color4.Red, true);
-                SquareTransition(74641 + delay, 77353 + delay, 77353 + delay, 30, Color4.IndianRed);
-                SquareTransition(77353 + delay, 80065 + delay, 80065 + delay, 30, Color4.IndianRed);
-                SquareTransition(80065 + delay, 82776 + delay, 82776 + delay, 30, Color4.IndianRed);
-                SquareTransition(82776 + delay, 85488 + delay, 85488 + delay, 30, Color4.IndianRed);
-                SquareTransition(85488 + delay, 88115 + delay, 88115 + delay, 30, Color4.IndianRed);
-                SquareTransition(86844 + delay, 88200 + delay, 88200 + delay, 15, Color4.White, true);
+                using (pool = new SpritePools(GetLayer("Transition")))
+                {
+                    SquareTransition(43454 + delay, 44810 + delay, 44810 + delay, 30, Color4.Purple);
+                    SquareTransition(66505 + delay, 69217 + delay, 69217 + delay, 30, Color4.IndianRed);
+                    SquareTransition(69217 + delay, 71929 + delay, 71929 + delay, 30, Color4.IndianRed);
+                    SquareTransition(71929 + delay, 74641 + delay, 74641 + delay, 30, Color4.IndianRed);
+                    SquareTransition(74641 + delay, 77353 + delay, 77353 + delay, 30, Color4.IndianRed);
+                    SquareTransition(77353 + delay, 80065 + delay, 80065 + delay, 30, Color4.IndianRed);
+                    SquareTransition(80065 + delay, 82776 + delay, 82776 + delay, 30, Color4.IndianRed);
+                    SquareTransition(82776 + delay, 85488 + delay, 85488 + delay, 30, Color4.IndianRed);
+                    SquareTransition(85488 + delay, 88115 + delay, 88115 + delay, 30, Color4.IndianRed);
+                }
+                using (pool = new SpritePools(GetLayer("Transition")))
+                {
+                    SquareTransition(76675 + delay, 77353 + delay, 77353 + delay, 15, Color4.Red, true);
+                    SquareTransition(86844 + delay, 88200 + delay, 88200 + delay, 15, Color4.White, true);
+                }
             };
 
             RedPart(0);
@@ -183,19 +196,23 @@ namespace StorybrewScripts
             var posY = squareScale / 2;
             var duration = endTime - startTime;
 
+            var i = 0;
             while (posX < 750)
             {
                 while (posY <= 485)
                 {
-                    var sprite = GetLayer("Transition").CreateSprite("sb/p.png", OsbOrigin.Centre, new Vector2(posX, posY));
+                    var sprite = pool.Get(startTime, reverse ? endTime : endFade + 500, "sb/p.png", OsbOrigin.Centre, new Vector2(posX, posY), true, i);
                     sprite.Scale(reverse ? OsbEasing.In : OsbEasing.None, startTime, endTime, reverse ? squareScale : 0, reverse ? 0 : squareScale);
                     sprite.Rotate(startTime, endTime, reverse ? -Math.PI : 0, reverse ? 0 : -Math.PI);
-                    sprite.Additive(startTime);
-                    if (color != Color4.White) sprite.Color(endFade, color);
+                    if ((Color4)sprite.ColorAt(startTime) != color) sprite.Color(startTime, color);
                     if (reverse) sprite.Fade(OsbEasing.Out, startTime, startTime + 500, 0, 0.4);
-                    else sprite.Fade(OsbEasing.Out, endFade, endFade + 500, 0.4, 0);
-
+                    else
+                    {
+                        sprite.Fade(startTime, 0.4);
+                        sprite.Fade(endFade, endFade + 500, 0.6, 0);
+                    }
                     posY += squareScale;
+                    i++;
                 }
                 posY = squareScale / 2;
                 posX += squareScale;

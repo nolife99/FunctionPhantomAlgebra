@@ -7,18 +7,22 @@ namespace StorybrewScripts
 {
     class ParticleManager : StoryboardObjectGenerator
     {
+        SpritePools pool;
         public override void Generate()
         {
-            Danmaku(44810, 65149, 5000);
-            Danmaku(44810, 65149, 5000, true);
+            using (pool = new SpritePools(GetLayer("")))
+            {
+                Danmaku(44810, 65149, 5000);
+                Danmaku(44810, 65149, 5000, true);
 
-            Danmaku(109895, 126166, 5000);
-            Danmaku(109895, 126166, 5000, true);
+                Danmaku(109895, 126166, 5000);
+                Danmaku(109895, 126166, 5000, true);
 
-            FallingDownParticle(88200, 109895, true);
-            FallingDownParticle(131590, 151929);
+                FallingDownParticle(88200, 109895, true);
+                FallingDownParticle(131590, 151929);
 
-            FallingDownParticle(174980, 217370, true);
+                FallingDownParticle(174980, 217370, true);
+            }
         }
         void Danmaku(int startTime, int endTime, int speed, bool reverse = false)
         {
@@ -34,7 +38,7 @@ namespace StorybrewScripts
 
                     var loopCount = (endTime - startTime - l * 35) / speed;
     
-                    var sprite = GetLayer("").CreateSprite("sb/p.png");
+                    var sprite = pool.Get(startTime + l * 100, startTime + speed * loopCount, "sb/p.png");
                     sprite.StartLoopGroup(startTime + l * 100, loopCount);
                     sprite.Move(0, speed, basePosition, endPosition);
                     sprite.Rotate(OsbEasing.In, 0, speed, angle, angle + (reverse ? 1 : -1));
@@ -57,12 +61,13 @@ namespace StorybrewScripts
                 var rotation = Random(-Math.PI / 2, Math.PI / 2);
                 var realStart = startTime + i * 40 > startTime + speed / 10 ? startTime + i * 50 - speed : startTime + i * 50;
 
-                var sprite = GetLayer("").CreateSprite("sb/p.png", OsbOrigin.Centre, startPos);
-                sprite.StartLoopGroup(realStart, (endTime - realStart) / speed + 1);
+                var sprite = pool.Get(realStart < startTime ? startTime : realStart, startTime + ((endTime - realStart) / speed + 1) * speed, 
+                "sb/p.png", OsbOrigin.Centre, new Vector2(startPos.X, 0), true, i);
 
+                sprite.StartLoopGroup(realStart, (endTime - realStart) / speed + 1);
                 sprite.MoveY(0, speed, startPos.Y, 490);
 
-                int scale = Random(2, 10);
+                int scale = Random(5, 10);
                 sprite.ScaleVec(0, speed / 2, scale, scale, scale, -scale);
                 sprite.ScaleVec(speed / 2, speed, scale, -scale, scale, scale);
 
@@ -70,7 +75,6 @@ namespace StorybrewScripts
                 sprite.Rotate(speed / 2, speed, rotation, rotation * 2);
                 sprite.EndGroup();
 
-                sprite.Additive(startTime);
                 sprite.Fade(startTime, startTime + speed / 10, 0, particleFade);
                 sprite.Fade(endTime, endTime + speed / 10, particleFade, 0);
 
@@ -82,11 +86,13 @@ namespace StorybrewScripts
                     var rot = Random(-Math.PI / 2, Math.PI / 2);
                     var start = startTime + i * 50 > startTime + circleSpeed / 10 ? startTime + i * 50 - circleSpeed : startTime + i * 50;
 
-                    var circle = GetLayer("").CreateSprite("sb/c.png", OsbOrigin.Centre, posStart);
+                    var circle = pool.Get(start < startTime ? startTime : start, startTime + ((endTime - start) / circleSpeed + 1) * circleSpeed, 
+                    "sb/c.png", OsbOrigin.Centre, new Vector2(posStart.X, 0), true, i);
+
                     circle.StartLoopGroup(start, (endTime - start) / circleSpeed + 1);
                     circle.MoveY(0, circleSpeed, posStart.Y, 490);
 
-                    double cScale = Random(0.007f, 0.049f);
+                    double cScale = Random(0.025f, 0.05f);
                     circle.ScaleVec(0, circleSpeed / 2, cScale, cScale, cScale, -cScale);
                     circle.ScaleVec(circleSpeed / 2, circleSpeed, cScale, -cScale, cScale, cScale);
 
@@ -94,7 +100,6 @@ namespace StorybrewScripts
                     circle.Rotate(circleSpeed / 2, circleSpeed, rot, rot * 2);
                     circle.EndGroup();
 
-                    circle.Additive(startTime);
                     circle.Fade(startTime, startTime + circleSpeed / 10, 0, fade);
                     circle.Fade(endTime, endTime + circleSpeed / 10, fade, 0);
                 }

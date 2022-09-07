@@ -26,10 +26,10 @@ namespace StorybrewScripts
             sprite.Color(StartTime, pixels ? "#BC62F5" : "#7FACF5");
             if (pixels) sprite.Rotate(StartTime, Math.PI / 4);
 
-            OsuHitObject lastObject = null;
+            var lastObject = (OsuHitObject)null;
             foreach (var hitobject in Beatmap.HitObjects)
             {
-                var timestep = Beatmap.GetTimingPointAt((int)hitobject.StartTime).BeatDuration / 32;
+                var timestep = Beatmap.GetTimingPointAt((int)hitobject.StartTime).BeatDuration / 56;
                 if (hitobject.StartTime >= StartTime - 5 && hitobject.StartTime <= EndTime + 5)
                 {
                     if (lastObject == null)
@@ -47,11 +47,11 @@ namespace StorybrewScripts
 
                                 var startPosition = hitobject.PositionAtTime(startTime);
                                 keyframe.Add(startTime, startPosition);
-                                keyframe.Simplify2dKeyframes(1, v => v);
 
                                 if (complete) break;
                                 startTime += timestep;
                             }
+                            keyframe.Simplify2dKeyframes(1, v => v);
                             keyframe.ForEachPair((start, end) =>
                             {
                                 sprite.Move(start.Time, end.Time, start.Value, end.Value);
