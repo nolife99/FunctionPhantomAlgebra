@@ -202,10 +202,10 @@ namespace StorybrewScripts
                 while (posY <= 485)
                 {
                     var sprite = pool.Get(startTime, reverse ? endTime : endFade + 500, "sb/p.png", OsbOrigin.Centre, new Vector2(posX, posY), true, i);
-                    sprite.Scale(reverse ? OsbEasing.In : OsbEasing.None, startTime, endTime, reverse ? squareScale : 0, reverse ? 0 : squareScale);
-                    sprite.Rotate(startTime, endTime, reverse ? -Math.PI : 0, reverse ? 0 : -Math.PI);
+                    sprite.Scale(reverse ? OsbEasing.InCirc : OsbEasing.None, startTime, endTime, reverse ? squareScale : 0, reverse ? 0 : squareScale);
+                    sprite.Rotate(reverse ? OsbEasing.InCirc : OsbEasing.In, startTime, endTime, reverse ? -Math.PI : 0, reverse ? 0 : -Math.PI);
                     if ((Color4)sprite.ColorAt(startTime) != color) sprite.Color(startTime, color);
-                    if (reverse) sprite.Fade(OsbEasing.Out, startTime, startTime + 500, 0, 0.4);
+                    if (reverse) sprite.Fade(OsbEasing.OutExpo, startTime, startTime + 500, 0, 0.4);
                     else
                     {
                         sprite.Fade(startTime, 0.4);
