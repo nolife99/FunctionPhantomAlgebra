@@ -89,7 +89,7 @@ namespace StorybrewScripts
             }))
             {
                 var lastPos = new CommandPosition(0, 0);
-                for (var i = StartTime; i < EndTime; i += 10)
+                for (var i = StartTime; i < EndTime; i += (int)Beatmap.GetTimingPointAt(StartTime).BeatDuration / 24)
                 {
                     var pos = sprite.PositionAt(i);
                     if (pos != lastPos)
