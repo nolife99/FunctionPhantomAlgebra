@@ -44,7 +44,7 @@ namespace StorybrewScripts
                     if (complete) break;
                     startTime += timeStep;
                 }
-                keyframe.Simplify2dKeyframes(1.0, v => v);
+                keyframe.Simplify2dKeyframes(3, v => v);
                 keyframe.ForEachPair((start, end) =>
                 {
                     sprite.Move(start.Time, end.Time, start.Value, end.Value);
