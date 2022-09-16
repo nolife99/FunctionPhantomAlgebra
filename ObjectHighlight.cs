@@ -19,13 +19,14 @@ namespace StorybrewScripts
         }
         void Cursor(int StartTime, int EndTime, bool pixels = false)
         {
-            var sprite = GetLayer("").CreateSprite(pixels ? "sb/p.png" : "sb/hl.png");
+            var cursorLayer = GetLayer("");
+            var sprite = cursorLayer.CreateSprite(pixels ? "sb/p.png" : "sb/hl.png");
             sprite.Fade(StartTime, StartTime + 1000, 0, 0.6);
             sprite.Fade(EndTime, EndTime + 1000, 0.6, 0);
-            sprite.Scale(StartTime, pixels ? 70 : 0.4);
+            sprite.Scale(StartTime, 70);
             sprite.Additive(StartTime);
-            sprite.Color(StartTime, pixels ? "#BC62F5" : "#7FACF5");
-            if (pixels) sprite.Rotate(StartTime, Math.PI / 4);
+            sprite.Color(StartTime, "#BC62F5");
+            sprite.Rotate(StartTime, Math.PI / 4);
 
             Action<OsuHitObject> GetSliderMovement = objects =>
             {
@@ -44,7 +45,7 @@ namespace StorybrewScripts
                     if (complete) break;
                     startTime += timeStep;
                 }
-                keyframe.Simplify2dKeyframes(3, v => v);
+                if (pixels) keyframe.Simplify2dKeyframes(1.5, v => v);
                 keyframe.ForEachPair((start, end) =>
                 {
                     sprite.Move(start.Time, end.Time, start.Value, end.Value);
@@ -65,12 +66,12 @@ namespace StorybrewScripts
                         if (lastObj is OsuSlider)
                         {
                             if (lastObj.EndPosition != hit.Position) sprite.Move(OsbEasing.Out, lastObj.EndTime, hit.StartTime, lastObj.EndPosition, hit.Position);
-                            if (pixels) sprite.Rotate(OsbEasing.Out, lastObj.EndTime, hit.StartTime, Math.PI / 4, -Math.PI / 4);
+                            sprite.Rotate(OsbEasing.Out, lastObj.EndTime, hit.StartTime, Math.PI / 4, -Math.PI / 4);
                         }
                         else if (lastObj is OsuCircle)
                         {
                             if (lastObj.Position != hit.Position) sprite.Move(OsbEasing.Out, lastObj.StartTime, hit.StartTime, lastObj.Position, hit.Position);
-                            if (pixels) sprite.Rotate(OsbEasing.Out, lastObj.EndTime, hit.StartTime, -Math.PI / 4, Math.PI / 4);
+                            sprite.Rotate(OsbEasing.Out, lastObj.EndTime, hit.StartTime, -Math.PI / 4, Math.PI / 4);
                         }
                         if (hit is OsuSlider)
                         {
@@ -102,6 +103,7 @@ namespace StorybrewScripts
                     lastPos = pos;
                 }
             }
+            if (!pixels) cursorLayer.Discard(sprite);
         }
     }
 }

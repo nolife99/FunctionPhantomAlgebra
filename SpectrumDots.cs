@@ -16,20 +16,19 @@ namespace StorybrewScripts
         }
         void Spectrum(int StartTime, int EndTime, bool DisplayBottom)
         {
-            var MinimalHeight = 0.25f;
+            var MinimalHeight = 1;
             var ScaleY = 70;
             float LogScale = 7;
             var Position = new Vector2(-103, 257);
             var Width = 854f;
 
             int BarCount = 100;
-            int fftCount = BarCount * 2;
+            var fftCount = BarCount * 2;
 
             var heightKeyframes = new KeyframedValue<float>[fftCount];
-            for (var i = 0; i < fftCount; i++)
-                heightKeyframes[i] = new KeyframedValue<float>(null);
+            for (var i = 0; i < fftCount; i++) heightKeyframes[i] = new KeyframedValue<float>(null);
 
-            var timeStep = Beatmap.GetTimingPointAt(StartTime).BeatDuration / 6;
+            var timeStep = Beatmap.GetTimingPointAt(StartTime).BeatDuration / 5;
             var offset = timeStep * 0.2;
             
             for (var t = (double)StartTime; t <= EndTime; t += timeStep)
@@ -37,17 +36,17 @@ namespace StorybrewScripts
                 var fft = GetFft(t + offset, fftCount, null, OsbEasing.InExpo);
                 for (var i = 0; i < fftCount; i++)
                 {
-                    var height = (float)Math.Log10(1 + fft[i] * LogScale) * ScaleY;
+                    var height = Math.Log10(1 + fft[i] * LogScale) * ScaleY;
                     if (height < MinimalHeight) height = MinimalHeight;
 
-                    heightKeyframes[i].Add(t, height);
+                    heightKeyframes[i].Add(t, (float)height);
                 }
             }
             var barWidth = Width / BarCount;
             for (var i = 0; i < BarCount; i++)
             {
                 var keyframes = heightKeyframes[i];
-                keyframes.Simplify1dKeyframes(1.9, f => f);
+                keyframes.Simplify1dKeyframes(1.5, f => f);
 
                 var topBar = GetLayer("").CreateSprite("sb/p.png", OsbOrigin.Centre, new Vector2(Position.X + i * barWidth, 0));
                 var bottomBar = GetLayer("").CreateSprite("sb/p.png", OsbOrigin.Centre, new Vector2(Position.X + i * barWidth, 0));
